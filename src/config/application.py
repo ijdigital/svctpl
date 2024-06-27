@@ -9,6 +9,7 @@ from typing import AnyStr, Optional, Dict
 from schemas import DatabaseConfig
 
 _test: Optional[AnyStr] = os.getenv('TEST_MODE', None)
+_database_to_use: Optional[AnyStr] = os.getenv('TEST_DATABASE', None)
 _conn = None
 
 
@@ -61,6 +62,10 @@ async def test_startup_event() -> None:
 
     :return: None
     """
+
+    if _database_to_use == 'sqlite':
+        await _initialize_tortoise_models()
+        return
 
     DATABASE: DatabaseConfig = DatabaseConfig(
         _testmode=True
@@ -134,7 +139,7 @@ async def _delete_and_create_test_database(conf: DatabaseConfig) -> None:
         await _conn.close()
 
 
-async def _initialize_tortoise_models(conf: DatabaseConfig) -> None:
+async def _initialize_tortoise_models(conf: Optional[DatabaseConfig] = None) -> None:
     """
     Initialize Tortoise ORM with the provided configuration.
 
@@ -142,7 +147,9 @@ async def _initialize_tortoise_models(conf: DatabaseConfig) -> None:
         conf (Dict): Configuration dictionary containing database connection details.
     """
 
-    _url: AnyStr = f'postgres://{conf.db_user}:{conf.db_password}@{conf.db_host}:{conf.db_port}/{conf.db_name}'
+    _url: AnyStr = f'sqlite://:memory:'
+    if conf:
+        _url: AnyStr = f'postgres://{conf.db_user}:{conf.db_password}@{conf.db_host}:{conf.db_port}/{conf.db_name}'
 
     try:
         await Tortoise.init(
