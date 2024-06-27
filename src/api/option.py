@@ -12,16 +12,16 @@ async def get() -> Any:
     return await service.get()
 
 
-@app.get('/options/{key}', response_model=OptionResponseModel, status_code=200)
-async def single(key: AnyStr) -> OptionResponseModel:
-    service: OptionService = OptionService()
-    return await service.single(key=key)
-
-
 @app.post('/options', response_model=OptionResponseModel, status_code=201)
 async def create(option: OptionCreateModel) -> OptionResponseModel:
     service: OptionService = OptionService()
     return await service.create(option=option)
+
+
+@app.get('/options/{key}', response_model=OptionResponseModel, status_code=200)
+async def single(key: AnyStr) -> OptionResponseModel:
+    service: OptionService = OptionService()
+    return await service.single(key=key)
 
 
 @app.patch('/options/{key}', response_model=OptionResponseModel, status_code=202)
