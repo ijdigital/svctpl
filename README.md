@@ -51,7 +51,8 @@ In project you will find env.sample file. Create .env file from env.sample
 
 ### Note: 
 
-<span style="color: #78866b;">For now you will have to create manually databases, <database_name> and test_<database_name>. In next release we hope that will not be necessary.</span>
+<span style="color: #78866b;">In /tests/__init__.py you can specify which database engine you want to use, 'psql' or 'sqlite', by default it'll be psql. 
+<br>If you chose psql for now you will have to create manually databases, <database_name> and test_<database_name>. In next release we hope that will not be necessary.</span>
 
 
 
