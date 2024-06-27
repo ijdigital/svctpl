@@ -3,28 +3,19 @@ from httpx import Response
 from typing import Dict, List, AnyStr, Optional
 
 from .test_base import TestBase
+from .assets import *
 
 
 class TestOption(TestBase):
 
-    async def get_option(self, params: Optional[Dict] = None) -> Response:
-        if not params:
-            params: Dict = dict()
+    async def test_get_options(self):
+        _response: Response = await self.api('GET', '/options')
 
-        async with httpx.AsyncClient(app=self.app, base_url='https://test') as client:
-            _res: Response = await client.get(
-                '/option',
-                params=params
-            )
-
-        return _res
+        assert _response.status_code == 200
+        assert 'options' in _response.json()
 
     async def test_create_option(self):
-        async with httpx.AsyncClient(app=self.app, base_url='https://test') as client:
-            _res: Response = await client.post(
-                '/options',
-                json={
-                    'key': 'test',
-                    'value': {'test': 1}
-                }
-            )
+        _response: Response = await self.api('POST', '/options', _body=body_create_option)
+
+        assert _response.status_code == 201
+        assert _response.json() == body_create_option

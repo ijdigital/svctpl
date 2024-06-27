@@ -11,11 +11,6 @@ from config.application import shutdown_event, startup_event, service
 
 class TestBase:
 
-    @pytest.mark.asyncio
-    async def test(self):
-        async with httpx.AsyncClient(app=self.app, base_url='http://test') as client:
-            _res: httpx.Response = await client.get('/home')
-
     async def setup(self):
         self.import_modules(['service'])
 
@@ -45,5 +40,18 @@ class TestBase:
         yield
         await shutdown_event()
 
-    async def api(self, _url: AnyStr, _method: AnyStr) -> Response | Dict:
-        ...
+    async def api(self, _method: AnyStr, _endpoint: AnyStr, _body: Optional[Dict] = None) -> Response | Dict:
+        _method = _method.lower()
+
+        params: Dict = {
+            'url': _endpoint,
+        }
+        if _method != 'get':
+            params['json'] = _body if _body else {}
+
+        async with httpx.AsyncClient(app=self.app, base_url='https://test') as client:
+            func = getattr(client, _method, None)
+
+            response = await func(**params)
+
+        return response
